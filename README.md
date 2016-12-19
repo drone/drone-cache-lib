@@ -1,9 +1,9 @@
-# drone-cache
+# drone-cache-lib
 
 [![Build Status](http://beta.drone.io/api/badges/drone-plugins/drone-cache/status.svg)](http://beta.drone.io/drone-plugins/drone-cache)
 [![Coverage Status](https://aircover.co/badges/drone-plugins/drone-cache/coverage.svg)](https://aircover.co/drone-plugins/drone-cache)
 
-drone-cache is a Go client library for creating cache [plugins](http://readme.drone.io/0.5/plugins/).
+drone-cache is a Go client library for creating cache [plugins](http://plugins.drone.io).
 
 Download the package using `go get`:
 
@@ -35,7 +35,7 @@ cache, err := cache.New(storage)
 To rebuild the cache:
 
 ```Go
-err := cache.Rebuild(src, dst) 
+err := cache.Rebuild(src, dst)
 ```
 
 To restore the cache:
