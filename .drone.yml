@@ -1,0 +1,18 @@
+workspace:
+  base: /go
+  path: src/github.com/drone-plugins/drone-cache
+
+pipeline:
+  test:
+    image: golang:1.7
+    environment:
+      - CGO_ENABLED=0
+    commands:
+      - go get -t ./...
+      - |
+        for pkg in $(go list ./...)
+        do
+          cd $GOPATH/src/$pkg/
+          go vet
+          go test -cover -coverprofile coverage.out
+        done
