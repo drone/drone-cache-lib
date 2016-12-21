@@ -124,7 +124,8 @@ func getList(src string, s storage.Storage) ([]storage.File, error) {
 func findFiles(files []storage.File, age time.Duration) []storage.File {
 	var matchedFiles []storage.File
 	for _, file := range files {
-		if !file.FileInfo.IsDir() && file.FileInfo.ModTime().Before(time.Now().Add(-1 * age)) {
+		// Match files (not dirs) older then age
+		if !file.Info.IsDir() && file.Info.ModTime().Before(time.Now().Add(-1 * age)) {
 			matchedFiles = append(matchedFiles, file)
 		}
 	}

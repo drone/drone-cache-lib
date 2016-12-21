@@ -62,7 +62,7 @@ func (s *dummyStorage) List(p string) ([]File, error) {
 
 		files = append(files, File{
 			Path: path,
-			FileInfo: fi,
+			Info: fi,
 		})
 
 		return nil

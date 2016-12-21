@@ -7,7 +7,7 @@ import (
 
 type File struct {
 	Path string
-	FileInfo os.FileInfo
+	Info os.FileInfo
 }
 
 // Storage is a place that files can be written to and read from.
