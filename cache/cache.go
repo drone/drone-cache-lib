@@ -2,6 +2,7 @@ package cache
 
 import (
 	"io"
+	"time"
 
 	"github.com/drone/drone-cache-lib/archive"
 	"github.com/drone/drone-cache-lib/archive/util"
@@ -53,6 +54,21 @@ func (c Cache) Restore(src string, fallback string) error {
 	return nil
 }
 
+func (c Cache) Cleanup(src string, age time.Duration) error {
+	log.Infof("Cleaning files from %s older then %s", src, age)
+
+	files, err := getList(src, c.s)
+	if err != nil {
+		return err
+	}
+
+	files = findFiles(files, age)
+
+	err = deleteFiles(files, c.s)
+
+	return err
+}
+
 func restoreCache(src string, s storage.Storage, a archive.Archive) error {
 	reader, writer := io.Pipe()
 
@@ -98,4 +114,32 @@ func rebuildCache(srcs []string, dst string, s storage.Storage, a archive.Archiv
 	}
 
 	return err
+}
+
+
+func getList(src string, s storage.Storage) ([]storage.File, error) {
+	return s.List(src)
+}
+
+func findFiles(files []storage.File, age time.Duration) []storage.File {
+	var matchedFiles []storage.File
+	for _, file := range files {
+		if !file.FileInfo.IsDir() && file.FileInfo.ModTime().Before(time.Now().Add(-1 * age)) {
+			matchedFiles = append(matchedFiles, file)
+		}
+	}
+
+	return matchedFiles
+}
+
+func deleteFiles(files []storage.File, s storage.Storage) error {
+	var err error
+	for _, file := range files {
+		err = s.Delete(file.Path)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
