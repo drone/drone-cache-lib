@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-type File struct {
+type FileEntry struct {
 	Path string
 	Info os.FileInfo
 }
@@ -14,6 +14,6 @@ type File struct {
 type Storage interface {
 	Get(p string, dst io.Writer) error
 	Put(p string, src io.Reader) error
-	List(p string) ([]File, error)
+	List(p string) ([]FileEntry, error)
 	Delete(p string) error
 }

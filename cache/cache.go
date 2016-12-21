@@ -117,12 +117,12 @@ func rebuildCache(srcs []string, dst string, s storage.Storage, a archive.Archiv
 }
 
 
-func getList(src string, s storage.Storage) ([]storage.File, error) {
+func getList(src string, s storage.Storage) ([]storage.FileEntry, error) {
 	return s.List(src)
 }
 
-func findFiles(files []storage.File, age time.Duration) []storage.File {
-	var matchedFiles []storage.File
+func findFiles(files []storage.FileEntry, age time.Duration) []storage.FileEntry {
+	var matchedFiles []storage.FileEntry
 	for _, file := range files {
 		// Match files (not dirs) older then age
 		if !file.Info.IsDir() && file.Info.ModTime().Before(time.Now().Add(-1 * age)) {
@@ -133,7 +133,7 @@ func findFiles(files []storage.File, age time.Duration) []storage.File {
 	return matchedFiles
 }
 
-func deleteFiles(files []storage.File, s storage.Storage) error {
+func deleteFiles(files []storage.FileEntry, s storage.Storage) error {
 	var err error
 	for _, file := range files {
 		err = s.Delete(file.Path)

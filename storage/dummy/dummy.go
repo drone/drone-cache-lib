@@ -51,16 +51,16 @@ func (s *dummyStorage) Put(p string, src io.Reader) error {
 	return nil
 }
 
-func (s *dummyStorage) List(p string) ([]File, error) {
+func (s *dummyStorage) List(p string) ([]FileEntry, error) {
 	log.Infof("Retrieving list of files from %s", p)
 
-	var files []File
+	var files []FileEntry
 	fwErr := filepath.Walk(p, func(path string, fi os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 
-		files = append(files, File{
+		files = append(files, FileEntry{
 			Path: path,
 			Info: fi,
 		})
