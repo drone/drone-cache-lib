@@ -1,23 +1,23 @@
 package timeflusher
 
 import (
-  "time"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 
 	. "github.com/drone/drone-cache-lib/flusher"
-  "github.com/drone/drone-cache-lib/storage"
+	"github.com/drone/drone-cache-lib/storage"
 )
 
 type timeFlusher struct{
-  Age time.Duration
+	Age time.Duration
 }
 
 // New creates an Flusher that ops on time.Duration
 func New(age time.Duration) Flusher {
 	return &timeFlusher{
-    Age: age,
-  }
+		Age: age,
+	}
 }
 
 func (f *timeFlusher) Find(files []storage.FileEntry) ([]storage.FileEntry, error) {
@@ -29,7 +29,7 @@ func (f *timeFlusher) Find(files []storage.FileEntry) ([]storage.FileEntry, erro
 		}
 	}
 
-  log.Infof("Found %s files", len(matchedFiles))
+	log.Infof("Found %s files", len(matchedFiles))
 
 	return matchedFiles, nil
 }
