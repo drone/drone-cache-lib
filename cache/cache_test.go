@@ -9,6 +9,8 @@ import (
 	"time"
 	. "github.com/franela/goblin"
 
+	"github.com/drone/drone-cache-lib/archive/tar"
+	"github.com/drone/drone-cache-lib/flusher/timeflusher"
 	"github.com/drone/drone-cache-lib/storage/dummy"
 )
 
@@ -32,22 +34,12 @@ func TestCache(t *testing.T) {
 			cleanFixtures()
 		})
 
-		g.Describe("New", func() {
-			g.It("Should create new Cache", func() {
-				s, err := dummy.New(dummyOpts)
-				g.Assert(err == nil).IsTrue("failed to create storage")
-
-				_, err = New(s)
-				g.Assert(err == nil).IsTrue("failed to create cache")
-			})
-		})
-
 		g.Describe("Rebuild", func() {
 			g.It("Should rebuild with no errors", func() {
 				s, err := dummy.New(dummyOpts)
 				g.Assert(err == nil).IsTrue("failed to create storage")
 
-				c, err := New(s)
+				c := NewDefault(s)
 				g.Assert(err == nil).IsTrue("failed to create cache")
 
 				os.Chdir("/tmp/fixtures/mounts")
@@ -58,23 +50,11 @@ func TestCache(t *testing.T) {
 				g.Assert(err == nil).IsTrue("failed to rebuild the cache")
 			})
 
-			g.It("Should return error on failure", func() {
-				s, err := dummy.New(dummyOpts)
-				g.Assert(err == nil).IsTrue("failed to create storage")
-
-				c, err := New(s)
-				g.Assert(err == nil).IsTrue("failed to create cache")
-
-				err = c.Rebuild([]string{"mount1", "mount2"}, "file.ttt")
-				g.Assert(err != nil).IsTrue("failed to return error")
-				g.Assert(err.Error()).Equal("Unknown file format for archive file.ttt")
-			})
-
 			g.It("Should return error from channel", func() {
 				s, err := dummy.New(dummyOpts)
 				g.Assert(err == nil).IsTrue("failed to create storage")
 
-				c, err := New(s)
+				c := NewDefault(s)
 				g.Assert(err == nil).IsTrue("failed to create cache")
 
 				err = c.Rebuild([]string{"mount1", "mount2"}, "file.tar")
@@ -88,7 +68,7 @@ func TestCache(t *testing.T) {
 				s, err := dummy.New(dummyOpts)
 				g.Assert(err == nil).IsTrue("failed to create storage")
 
-				c, err := New(s)
+				c := NewDefault(s)
 				g.Assert(err == nil).IsTrue("failed to create cache")
 
 				err = c.Restore("fixtures/test.tar", "")
@@ -102,7 +82,7 @@ func TestCache(t *testing.T) {
 				s, err := dummy.New(dummyOpts)
 				g.Assert(err == nil).IsTrue("failed to create storage")
 
-				c, err := New(s)
+				c := NewDefault(s)
 				g.Assert(err == nil).IsTrue("failed to create cache")
 
 				err = c.Restore("fixtures/test2.tar", "fixtures/test.tar")
@@ -116,22 +96,11 @@ func TestCache(t *testing.T) {
 				s, err := dummy.New(dummyOpts)
 				g.Assert(err == nil).IsTrue("failed to create storage")
 
-				c, err := New(s)
+				c := NewDefault(s)
 				g.Assert(err == nil).IsTrue("failed to create cache")
 
 				err = c.Restore("fixtures/test2.tar", "")
 				g.Assert(err == nil).IsTrue("should not have returned error on missing file")
-			})
-
-			g.It("Should return error on unknown file format", func() {
-				s, err := dummy.New(dummyOpts)
-				g.Assert(err == nil).IsTrue("failed to create storage")
-
-				c, err := New(s)
-				g.Assert(err == nil).IsTrue("failed to create cache")
-
-				err = c.Restore("fixtures/test2.ttt", "")
-				g.Assert(err != nil).IsTrue("failed to return filetype error")
 			})
 		})
 
@@ -145,10 +114,10 @@ func TestCache(t *testing.T) {
 				s, err := dummy.New(dummyOpts)
 				g.Assert(err == nil).IsTrue("failed to create storage")
 
-				c, err := New(s)
+				c := New(s, tar.New(), timeflusher.New(time.Duration(20*24)*time.Hour))
 				g.Assert(err == nil).IsTrue("failed to create cache")
 
-				c.Cleanup("fixtures/cleanup/proj1", time.Duration(20*24)*time.Hour)
+				c.Cleanup("fixtures/cleanup/proj1")
 				g.Assert(err == nil).IsTrue("failed to cleanup nothing")
 
 				// Check expected files still exist
@@ -161,11 +130,11 @@ func TestCache(t *testing.T) {
 				s, err := dummy.New(dummyOpts)
 				g.Assert(err == nil).IsTrue("failed to create storage")
 
-				c, err := New(s)
+				c := New(s, tar.New(), timeflusher.New(time.Duration(9*24)*time.Hour))
 				g.Assert(err == nil).IsTrue("failed to create cache")
 
 				// Perform Cleanup
-				c.Cleanup("fixtures/cleanup/proj1", time.Duration(9*24)*time.Hour)
+				c.Cleanup("fixtures/cleanup/proj1")
 				g.Assert(err == nil).IsTrue("failed to cleanup nothing")
 
 				// Check expected files no longer exist
@@ -197,7 +166,6 @@ func createFixtures() {
 
 func cleanFixtures() {
 	os.RemoveAll("/tmp/fixtures/")
-	// os.RemoveAll("/tmp/extracted/")
 }
 
 func createDirectories() {

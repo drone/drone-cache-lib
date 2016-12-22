@@ -5,7 +5,9 @@ import (
 	"time"
 
 	"github.com/drone/drone-cache-lib/archive"
-	"github.com/drone/drone-cache-lib/archive/util"
+	"github.com/drone/drone-cache-lib/archive/tar"
+	"github.com/drone/drone-cache-lib/flusher"
+	"github.com/drone/drone-cache-lib/flusher/timeflusher"
 	"github.com/drone/drone-cache-lib/storage"
 
 	log "github.com/Sirupsen/logrus"
@@ -13,36 +15,29 @@ import (
 
 type Cache struct {
 	s storage.Storage
+	a archive.Archive
+	f flusher.Flusher
 }
 
-func New(s storage.Storage) (Cache, error) {
-	return Cache{
-		s: s,
-	}, nil
+func New(s storage.Storage, a archive.Archive, f flusher.Flusher) Cache {
+	return Cache{ s: s, a: a, f: f }
+}
+
+func NewDefault(s storage.Storage) Cache {
+	// Return default Cache that uses tar and flushes items after 7 days
+	return New(s, tar.New(), timeflusher.New(time.Duration(7*24)*time.Hour))
 }
 
 func (c Cache) Rebuild(srcs []string, dst string) error {
-	a, err := util.FromFilename(dst)
-
-	if err != nil {
-		return err
-	}
-
-	return rebuildCache(srcs, dst, c.s, a)
+	return rebuildCache(srcs, dst, c.s, c.a)
 }
 
 func (c Cache) Restore(src string, fallback string) error {
-	a, err := util.FromFilename(src)
-
-	if err != nil {
-		return err
-	}
-
-	err = restoreCache(src, c.s, a)
+	err := restoreCache(src, c.s, c.a)
 
 	if err != nil && fallback != "" && fallback != src {
 		log.Warnf("Failed to retrieve %s, trying %s", src, fallback)
-		err = restoreCache(fallback, c.s, a)
+		err = restoreCache(fallback, c.s, c.a)
 	}
 
 	// Cache plugin should print an error but it should not return it
@@ -54,15 +49,18 @@ func (c Cache) Restore(src string, fallback string) error {
 	return nil
 }
 
-func (c Cache) Cleanup(src string, age time.Duration) error {
-	log.Infof("Cleaning files from %s older then %s", src, age)
+func (c Cache) Cleanup(src string) error {
+	log.Infof("Cleaning files from %s", src)
 
 	files, err := getList(src, c.s)
 	if err != nil {
 		return err
 	}
 
-	files = findFiles(files, age)
+	files, err = c.f.Find(files)
+	if err != nil {
+		return err
+	}
 
 	err = deleteFiles(files, c.s)
 
@@ -119,18 +117,6 @@ func rebuildCache(srcs []string, dst string, s storage.Storage, a archive.Archiv
 
 func getList(src string, s storage.Storage) ([]storage.FileEntry, error) {
 	return s.List(src)
-}
-
-func findFiles(files []storage.FileEntry, age time.Duration) []storage.FileEntry {
-	var matchedFiles []storage.FileEntry
-	for _, file := range files {
-		// Match files (not dirs) older then age
-		if !file.Info.IsDir() && file.Info.ModTime().Before(time.Now().Add(-1 * age)) {
-			matchedFiles = append(matchedFiles, file)
-		}
-	}
-
-	return matchedFiles
 }
 
 func deleteFiles(files []storage.FileEntry, s storage.Storage) error {
