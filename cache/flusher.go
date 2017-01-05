@@ -44,13 +44,8 @@ func (f *Flusher) Flush(src string) error {
 }
 
 func IsExpired(file storage.FileEntry) bool {
-	// Do not delete directories
-	if file.Info.IsDir() {
-		return false
-	}
-
 	// Check if older then 30 days
-	if file.Info.ModTime().Before(time.Now().AddDate(0, 0, -30)) {
+	if file.LastModified.Before(time.Now().AddDate(0, 0, -30)) {
 		return true
 	}
 
