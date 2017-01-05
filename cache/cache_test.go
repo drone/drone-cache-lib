@@ -115,7 +115,7 @@ func checkFileRemoved(fileName string, g *G) {
 }
 
 func createFixtures() {
-	createDirectories()
+	createDirectories(cacheFixtureDirectories)
 	createMountContent()
 }
 
@@ -123,12 +123,7 @@ func cleanFixtures() {
 	os.RemoveAll("/tmp/fixtures/")
 }
 
-func createDirectories() {
-	directories := []string{
-		"/tmp/fixtures/tarfiles",
-		"/tmp/fixtures/mounts/subdir",
-	}
-
+func createDirectories(directories []string) {
 	for _, directory := range directories {
 		if _, err := os.Stat(directory); os.IsNotExist(err) {
 			os.MkdirAll(directory, os.FileMode(int(0755)))
@@ -162,5 +157,10 @@ var (
 	mountFiles = []testFile{
 		{Path: "test.txt", Content: "hello\ngo\n"},
 		{Path: "subdir/test2.txt", Content: "hello2\ngo\n"},
+	}
+
+	cacheFixtureDirectories = []string{
+		"/tmp/fixtures/tarfiles",
+		"/tmp/fixtures/mounts/subdir",
 	}
 )

@@ -1,4 +1,4 @@
-package flusher
+package cache
 
 import(
 	"time"
@@ -15,11 +15,11 @@ type Flusher struct {
 	dirty func(storage.FileEntry) bool
 }
 
-func New(s storage.Storage, fn dirtyFunc) Flusher {
+func NewFlusher(s storage.Storage, fn dirtyFunc) Flusher {
 	return Flusher{ store: s, dirty: fn }
 }
 
-func NewDefault(s storage.Storage) Flusher {
+func NewDefaultFlusher(s storage.Storage) Flusher {
 	return Flusher{ store: s, dirty: TimeOp() }
 }
 

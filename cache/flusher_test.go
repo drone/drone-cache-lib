@@ -1,4 +1,4 @@
-package flusher
+package cache
 
 import (
 	"io/ioutil"
@@ -20,7 +20,7 @@ func TestFlusher(t *testing.T) {
 
 		g.Before(func() {
 			os.Chdir("/tmp")
-			createFixtures()
+			createFlusherFixtures()
 		})
 
 		g.BeforeEach(func() {
@@ -42,7 +42,7 @@ func TestFlusher(t *testing.T) {
 				s, err := dummy.New(dummyOpts)
 				g.Assert(err == nil).IsTrue("failed to create storage")
 
-				f := New(s, noFind)
+				f := NewFlusher(s, noFind)
 
 				f.Flush("fixtures/cleanup/proj1")
 				g.Assert(err == nil).IsTrue("failed to cleanup nothing")
@@ -57,7 +57,7 @@ func TestFlusher(t *testing.T) {
 				s, err := dummy.New(dummyOpts)
 				g.Assert(err == nil).IsTrue("failed to create storage")
 
-				f := NewDefault(s)
+				f := NewDefaultFlusher(s)
 
 				// Perform Cleanup
 				f.Flush("fixtures/cleanup/proj1")
@@ -74,40 +74,9 @@ func TestFlusher(t *testing.T) {
 	})
 }
 
-func checkFileExists(fileName string, g *G) {
-	_, err := os.Stat(fileName)
-	g.Assert(err == nil).IsTrue(fileName + " should still exist")
-}
-
-func checkFileRemoved(fileName string, g *G) {
-	_, err := os.Stat(fileName)
-	g.Assert(err != nil).IsTrue("Failed to clean " + fileName)
-}
-
-func createFixtures() {
-	createDirectories()
+func createFlusherFixtures() {
+	createDirectories(flusherFixtureDirectories)
 	createCleanupContent()
-}
-
-func cleanFixtures() {
-	os.RemoveAll("/tmp/fixtures/")
-}
-
-func createDirectories() {
-	directories := []string{
-		"/tmp/fixtures/cleanup/proj1/master",
-		"/tmp/fixtures/cleanup/proj1/newtest",
-		"/tmp/fixtures/cleanup/proj1/oldtest",
-		"/tmp/fixtures/cleanup/proj2/master",
-		"/tmp/fixtures/cleanup/proj2/newtest",
-		"/tmp/fixtures/cleanup/proj2/oldtest",
-	}
-
-	for _, directory := range directories {
-		if _, err := os.Stat(directory); os.IsNotExist(err) {
-			os.MkdirAll(directory, os.FileMode(int(0755)))
-		}
-	}
 }
 
 func createCleanupContent() {
@@ -126,19 +95,7 @@ func createCleanupContent() {
 	}
 }
 
-type testFile struct {
-	Path string
-	Content string
-	Time time.Time
-}
-
 var (
-	dummyOpts = &dummy.Options{
-		Server:   "myserver.com",
-		Username: "johndoe",
-		Password: "supersecret",
-	}
-
 	cleanupFiles = []testFile{
 		{Path: "proj1/master/archive.txt", Content: "hello\ngo\n", Time: time.Now()},
 		{Path: "proj1/newtest/archive.txt", Content: "hello2\ngo\n", Time: time.Now().AddDate(0, 0, -1)},
@@ -155,5 +112,14 @@ var (
 		}
 
 		return false
+	}
+
+	flusherFixtureDirectories = []string{
+		"/tmp/fixtures/cleanup/proj1/master",
+		"/tmp/fixtures/cleanup/proj1/newtest",
+		"/tmp/fixtures/cleanup/proj1/oldtest",
+		"/tmp/fixtures/cleanup/proj2/master",
+		"/tmp/fixtures/cleanup/proj2/newtest",
+		"/tmp/fixtures/cleanup/proj2/oldtest",
 	}
 )
