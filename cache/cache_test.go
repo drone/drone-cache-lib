@@ -9,8 +9,6 @@ import (
 	"time"
 	. "github.com/franela/goblin"
 
-	"github.com/drone/drone-cache-lib/archive/tar"
-	"github.com/drone/drone-cache-lib/flusher/timeflusher"
 	"github.com/drone/drone-cache-lib/storage/dummy"
 )
 
@@ -103,48 +101,6 @@ func TestCache(t *testing.T) {
 				g.Assert(err == nil).IsTrue("should not have returned error on missing file")
 			})
 		})
-
-		g.Describe("Cleanup", func() {
-
-			g.BeforeEach(func() {
-				createCleanupContent()
-			})
-
-			g.It("Should find no files to cleanup", func() {
-				s, err := dummy.New(dummyOpts)
-				g.Assert(err == nil).IsTrue("failed to create storage")
-
-				c := New(s, tar.New(), timeflusher.New(time.Duration(20*24)*time.Hour))
-				g.Assert(err == nil).IsTrue("failed to create cache")
-
-				c.Cleanup("fixtures/cleanup/proj1")
-				g.Assert(err == nil).IsTrue("failed to cleanup nothing")
-
-				// Check expected files still exist
-				checkFileExists("/tmp/fixtures/cleanup/proj1/master/archive.txt", g)
-				checkFileExists("/tmp/fixtures/cleanup/proj1/oldtest/archive.txt", g)
-				checkFileExists("/tmp/fixtures/cleanup/proj1/newtest/archive.txt", g)
-			})
-
-			g.It("Should find some files to cleanup", func() {
-				s, err := dummy.New(dummyOpts)
-				g.Assert(err == nil).IsTrue("failed to create storage")
-
-				c := New(s, tar.New(), timeflusher.New(time.Duration(9*24)*time.Hour))
-				g.Assert(err == nil).IsTrue("failed to create cache")
-
-				// Perform Cleanup
-				c.Cleanup("fixtures/cleanup/proj1")
-				g.Assert(err == nil).IsTrue("failed to cleanup nothing")
-
-				// Check expected files no longer exist
-				checkFileRemoved("/tmp/fixtures/cleanup/proj1/oldtest/archive.txt", g)
-
-				// Check expected files still exist
-				checkFileExists("/tmp/fixtures/cleanup/proj1/master/archive.txt", g)
-				checkFileExists("/tmp/fixtures/cleanup/proj1/newtest/archive.txt", g)
-			})
-		})
 	})
 }
 
@@ -161,7 +117,6 @@ func checkFileRemoved(fileName string, g *G) {
 func createFixtures() {
 	createDirectories()
 	createMountContent()
-	createCleanupContent()
 }
 
 func cleanFixtures() {
@@ -172,12 +127,6 @@ func createDirectories() {
 	directories := []string{
 		"/tmp/fixtures/tarfiles",
 		"/tmp/fixtures/mounts/subdir",
-		"/tmp/fixtures/cleanup/proj1/master",
-		"/tmp/fixtures/cleanup/proj1/newtest",
-		"/tmp/fixtures/cleanup/proj1/oldtest",
-		"/tmp/fixtures/cleanup/proj2/master",
-		"/tmp/fixtures/cleanup/proj2/newtest",
-		"/tmp/fixtures/cleanup/proj2/oldtest",
 	}
 
 	for _, directory := range directories {
@@ -191,22 +140,6 @@ func createMountContent() {
 	var err error
 	for _, element := range mountFiles {
 		err = ioutil.WriteFile("/tmp/fixtures/mounts/" + element.Path, []byte(element.Content), 0644)
-		if err != nil {
-			log.Fatalln(err)
-		}
-	}
-}
-
-func createCleanupContent() {
-	var name string
-	var err error
-	for _, element := range cleanupFiles {
-		name = "/tmp/fixtures/cleanup/" + element.Path
-		err = ioutil.WriteFile(name, []byte(element.Content), 0644)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		err = os.Chtimes(name, element.Time, element.Time)
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -229,11 +162,5 @@ var (
 	mountFiles = []testFile{
 		{Path: "test.txt", Content: "hello\ngo\n"},
 		{Path: "subdir/test2.txt", Content: "hello2\ngo\n"},
-	}
-
-	cleanupFiles = []testFile{
-		{Path: "proj1/master/archive.txt", Content: "hello\ngo\n", Time: time.Now()},
-		{Path: "proj1/newtest/archive.txt", Content: "hello2\ngo\n", Time: time.Now().AddDate(0, 0, -1)},
-		{Path: "proj1/oldtest/archive.txt", Content: "hello\ngo\n", Time: time.Now().AddDate(0, 0, -10)},
 	}
 )

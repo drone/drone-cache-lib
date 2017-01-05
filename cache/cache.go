@@ -2,12 +2,9 @@ package cache
 
 import (
 	"io"
-	"time"
 
 	"github.com/drone/drone-cache-lib/archive"
 	"github.com/drone/drone-cache-lib/archive/tar"
-	"github.com/drone/drone-cache-lib/flusher"
-	"github.com/drone/drone-cache-lib/flusher/timeflusher"
 	"github.com/drone/drone-cache-lib/storage"
 
 	log "github.com/Sirupsen/logrus"
@@ -16,16 +13,15 @@ import (
 type Cache struct {
 	s storage.Storage
 	a archive.Archive
-	f flusher.Flusher
 }
 
-func New(s storage.Storage, a archive.Archive, f flusher.Flusher) Cache {
-	return Cache{ s: s, a: a, f: f }
+func New(s storage.Storage, a archive.Archive) Cache {
+	return Cache{ s: s, a: a }
 }
 
 func NewDefault(s storage.Storage) Cache {
 	// Return default Cache that uses tar and flushes items after 7 days
-	return New(s, tar.New(), timeflusher.New(time.Duration(7*24)*time.Hour))
+	return New(s, tar.New())
 }
 
 func (c Cache) Rebuild(srcs []string, dst string) error {
@@ -47,24 +43,6 @@ func (c Cache) Restore(src string, fallback string) error {
 	}
 
 	return nil
-}
-
-func (c Cache) Cleanup(src string) error {
-	log.Infof("Cleaning files from %s", src)
-
-	files, err := getList(src, c.s)
-	if err != nil {
-		return err
-	}
-
-	files, err = c.f.Find(files)
-	if err != nil {
-		return err
-	}
-
-	err = deleteFiles(files, c.s)
-
-	return err
 }
 
 func restoreCache(src string, s storage.Storage, a archive.Archive) error {
@@ -112,21 +90,4 @@ func rebuildCache(srcs []string, dst string, s storage.Storage, a archive.Archiv
 	}
 
 	return err
-}
-
-
-func getList(src string, s storage.Storage) ([]storage.FileEntry, error) {
-	return s.List(src)
-}
-
-func deleteFiles(files []storage.FileEntry, s storage.Storage) error {
-	var err error
-	for _, file := range files {
-		err = s.Delete(file.Path)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
