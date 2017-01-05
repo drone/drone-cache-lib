@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"github.com/drone/drone-cache-lib/archive"
-	"github.com/drone/drone-cache-lib/archive/util"
+	"github.com/drone/drone-cache-lib/archive/tar"
 	"github.com/drone/drone-cache-lib/storage"
 
 	log "github.com/Sirupsen/logrus"
@@ -12,36 +12,28 @@ import (
 
 type Cache struct {
 	s storage.Storage
+	a archive.Archive
 }
 
-func New(s storage.Storage) (Cache, error) {
-	return Cache{
-		s: s,
-	}, nil
+func New(s storage.Storage, a archive.Archive) Cache {
+	return Cache{ s: s, a: a }
+}
+
+func NewDefault(s storage.Storage) Cache {
+	// Return default Cache that uses tar and flushes items after 7 days
+	return New(s, tar.New())
 }
 
 func (c Cache) Rebuild(srcs []string, dst string) error {
-	a, err := util.FromFilename(dst)
-
-	if err != nil {
-		return err
-	}
-
-	return rebuildCache(srcs, dst, c.s, a)
+	return rebuildCache(srcs, dst, c.s, c.a)
 }
 
 func (c Cache) Restore(src string, fallback string) error {
-	a, err := util.FromFilename(src)
-
-	if err != nil {
-		return err
-	}
-
-	err = restoreCache(src, c.s, a)
+	err := restoreCache(src, c.s, c.a)
 
 	if err != nil && fallback != "" && fallback != src {
 		log.Warnf("Failed to retrieve %s, trying %s", src, fallback)
-		err = restoreCache(fallback, c.s, a)
+		err = restoreCache(fallback, c.s, c.a)
 	}
 
 	// Cache plugin should print an error but it should not return it

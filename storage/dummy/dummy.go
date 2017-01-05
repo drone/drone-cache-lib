@@ -4,6 +4,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	log "github.com/Sirupsen/logrus"
 	. "github.com/drone/drone-cache-lib/storage"
@@ -48,4 +49,34 @@ func (s *dummyStorage) Put(p string, src io.Reader) error {
 	log.Infof("Finished reading for %s", p)
 
 	return nil
+}
+
+func (s *dummyStorage) List(p string) ([]FileEntry, error) {
+	log.Infof("Retrieving list of files from %s", p)
+
+	var files []FileEntry
+	fwErr := filepath.Walk(p, func(path string, fi os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		files = append(files, FileEntry{
+			Path: path,
+			Info: fi,
+		})
+
+		return nil
+	})
+
+	if fwErr != nil {
+		return nil, fwErr
+	}
+
+	return files, nil
+}
+
+func (s *dummyStorage) Delete(p string) error {
+	log.Infof("Deleteing %s", p)
+
+	return os.Remove(p)
 }

@@ -1,6 +1,6 @@
 workspace:
   base: /go
-  path: src/github.com/drone-plugins/drone-cache
+  path: src/github.com/drone/drone-cache-lib
 
 pipeline:
   test:
