@@ -20,7 +20,7 @@ func NewFlusher(s storage.Storage, fn dirtyFunc) Flusher {
 }
 
 func NewDefaultFlusher(s storage.Storage) Flusher {
-	return Flusher{ store: s, dirty: TimeOp() }
+	return Flusher{ store: s, dirty: IsExpired }
 }
 
 func (f *Flusher) Flush(src string) error {
@@ -43,19 +43,17 @@ func (f *Flusher) Flush(src string) error {
 	return nil
 }
 
-func TimeOp() dirtyFunc {
-	return func(file storage.FileEntry) bool {
-		// Do not delete directories
-		if file.Info.IsDir() {
-			return false
-		}
-
-		// Check if older then 30 days
-		if file.Info.ModTime().Before(time.Now().AddDate(0, 0, -30)) {
-			return true
-		}
-
-		// No match
+func IsExpired(file storage.FileEntry) bool {
+	// Do not delete directories
+	if file.Info.IsDir() {
 		return false
 	}
+
+	// Check if older then 30 days
+	if file.Info.ModTime().Before(time.Now().AddDate(0, 0, -30)) {
+		return true
+	}
+
+	// No match
+	return false
 }
