@@ -8,14 +8,14 @@ import(
 	log "github.com/Sirupsen/logrus"
 )
 
-type dirtyFunc func(storage.FileEntry) bool
+type DirtyFunc func(storage.FileEntry) bool
 
 type Flusher struct {
 	store storage.Storage
 	dirty func(storage.FileEntry) bool
 }
 
-func NewFlusher(s storage.Storage, fn dirtyFunc) Flusher {
+func NewFlusher(s storage.Storage, fn DirtyFunc) Flusher {
 	return Flusher{ store: s, dirty: fn }
 }
 
