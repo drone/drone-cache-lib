@@ -2,12 +2,13 @@ package storage
 
 import (
 	"io"
-	"os"
+	"time"
 )
 
 type FileEntry struct {
-	Path string
-	Info os.FileInfo
+	Path         string
+	Size         int64
+	LastModified time.Time
 }
 
 // Storage is a place that files can be written to and read from.

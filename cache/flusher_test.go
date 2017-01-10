@@ -103,15 +103,7 @@ var (
 	}
 
 	noFind = func(file storage.FileEntry) bool {
-		if file.Info.IsDir() {
-			return false
-		}
-
-		if file.Info.ModTime().Before(time.Now().AddDate(0, 0, -60)) {
-			return true
-		}
-
-		return false
+		return file.LastModified.Before(time.Now().AddDate(0, 0, -60))
 	}
 
 	flusherFixtureDirectories = []string{

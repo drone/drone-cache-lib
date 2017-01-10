@@ -62,7 +62,8 @@ func (s *dummyStorage) List(p string) ([]FileEntry, error) {
 
 		files = append(files, FileEntry{
 			Path: path,
-			Info: fi,
+			Size: fi.Size(),
+			LastModified: fi.ModTime(),
 		})
 
 		return nil
