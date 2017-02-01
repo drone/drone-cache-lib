@@ -1,7 +1,7 @@
 # drone-cache-lib
 
-[![Build Status](http://beta.drone.io/api/badges/drone-plugins/drone-cache/status.svg)](http://beta.drone.io/drone-plugins/drone-cache)
-[![Coverage Status](https://aircover.co/badges/drone-plugins/drone-cache/coverage.svg)](https://aircover.co/drone-plugins/drone-cache)
+[![Build Status](http://beta.drone.io/api/badges/drone/drone-cache-lib/status.svg)](http://beta.drone.io/drone/drone-cache-lib)
+[![Coverage Status](https://aircover.co/badges/drone/drone-cache-lib/coverage.svg)](https://aircover.co/drone/drone-cache-lib)
 
 drone-cache is a Go client library for creating cache [plugins](http://plugins.drone.io).
 
