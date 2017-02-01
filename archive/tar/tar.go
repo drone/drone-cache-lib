@@ -51,7 +51,7 @@ func (a *tarArchive) Pack(srcs []string, w io.Writer) error {
 				if link, err = os.Readlink(path); err != nil {
 					return err
 				}
-				log.Infof("Symbolic link found at %s to %s", path, link)
+				log.Debugf("Symbolic link found at %s to %s", path, link)
 
 				// Rewrite header for SymLink
 				header, err = tar.FileInfoHeader(fi, link)
@@ -133,7 +133,7 @@ func (a *tarArchive) Unpack(dst string, r io.Reader) error {
 			}
 
 			// Create the link
-			log.Infof("Creating link %s to %s", target, header.Linkname)
+			log.Debugf("Creating link %s to %s", target, header.Linkname)
 			err = os.Symlink(header.Linkname, target)
 
 			if err != nil {
