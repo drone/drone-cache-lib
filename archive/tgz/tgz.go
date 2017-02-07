@@ -22,9 +22,9 @@ func (a *tgzArchive) Pack(srcs []string, w io.Writer) error {
 	gw := gzip.NewWriter(w)
 	defer gw.Close()
 
-	tar_wr := tar.New()
+	taP := tar.New()
 
-	err := tar_wr.Pack(srcs, gw)
+	err := taP.Pack(srcs, gw)
 
 	return err
 }
@@ -36,9 +36,9 @@ func (a *tgzArchive) Unpack(dst string, r io.Reader) error {
 		return err
 	}
 
-	tar_r := tar.New()
+	taU := tar.New()
 
-	fw_err := tar_r.Unpack(dst, gr)
+	fwErr := taU.Unpack(dst, gr)
 
-	return fw_err
+	return fwErr
 }
