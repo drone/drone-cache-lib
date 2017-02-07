@@ -13,7 +13,7 @@ import (
 
 type tgzArchive struct{}
 
-// NewTarArchive creates an Archive that uses the .tar file format.
+// NewTgzArchive creates an Archive that uses the .tar.gz file format.
 func New() Archive {
 	return &tgzArchive{}
 }
