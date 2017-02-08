@@ -15,8 +15,7 @@ func FromFilename(name string) (Archive, error) {
 		return tar.New(), nil
 	}
 
-	if strings.HasSuffix(name, ".tgz") ||
-	strings.HasSuffix(name, ".tar.gz") {
+	if strings.HasSuffix(name, ".tgz") || strings.HasSuffix(name, ".tar.gz") {
 		return tgz.New(), nil
 	}
 
