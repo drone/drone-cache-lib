@@ -2,11 +2,12 @@ package cache
 
 import (
 	"io"
+	"path"
+	"os"
 
 	"github.com/drone/drone-cache-lib/archive"
 	"github.com/drone/drone-cache-lib/archive/tar"
 	"github.com/drone/drone-cache-lib/storage"
-
 	log "github.com/Sirupsen/logrus"
 )
 
@@ -69,6 +70,11 @@ func restoreCache(src string, s storage.Storage, a archive.Archive) error {
 
 func rebuildCache(srcs []string, dst string, s storage.Storage, a archive.Archive) error {
 	log.Infof("Rebuilding cache at %s to %s", srcs, dst)
+
+	dir, _ := path.Split(dst)
+	if err := os.MkdirAll(dir, 0775); err != nil {
+		return err
+	}
 
 	reader, writer := io.Pipe()
 	defer reader.Close()
