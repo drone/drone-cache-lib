@@ -12,7 +12,6 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
-
 	. "github.com/drone/drone-cache-lib/archive"
 )
 

@@ -2,6 +2,7 @@ package util
 
 import (
 	"testing"
+
 	. "github.com/franela/goblin"
 )
 

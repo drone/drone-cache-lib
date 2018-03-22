@@ -3,11 +3,10 @@ package cache
 import (
 	"io"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/drone/drone-cache-lib/archive"
 	"github.com/drone/drone-cache-lib/archive/tar"
 	"github.com/drone/drone-cache-lib/storage"
-
-	log "github.com/Sirupsen/logrus"
 )
 
 type Cache struct {
@@ -16,7 +15,7 @@ type Cache struct {
 }
 
 func New(s storage.Storage, a archive.Archive) Cache {
-	return Cache{ s: s, a: a }
+	return Cache{s: s, a: a}
 }
 
 func NewDefault(s storage.Storage) Cache {

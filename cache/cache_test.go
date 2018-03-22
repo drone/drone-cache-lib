@@ -7,9 +7,9 @@ import (
 	"os"
 	"testing"
 	"time"
-	. "github.com/franela/goblin"
 
 	"github.com/drone/drone-cache-lib/storage/dummy"
+	. "github.com/franela/goblin"
 )
 
 func TestCache(t *testing.T) {
@@ -134,7 +134,7 @@ func createDirectories(directories []string) {
 func createMountContent() {
 	var err error
 	for _, element := range mountFiles {
-		err = ioutil.WriteFile("/tmp/fixtures/mounts/" + element.Path, []byte(element.Content), 0644)
+		err = ioutil.WriteFile("/tmp/fixtures/mounts/"+element.Path, []byte(element.Content), 0644)
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -142,9 +142,9 @@ func createMountContent() {
 }
 
 type testFile struct {
-	Path string
+	Path    string
 	Content string
-	Time time.Time
+	Time    time.Time
 }
 
 var (

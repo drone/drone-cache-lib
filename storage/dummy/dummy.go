@@ -18,13 +18,13 @@ type Options struct {
 }
 
 type dummyStorage struct {
-	opts   *Options
+	opts *Options
 }
 
 // New creates an implementation of Storage with Dummy as the backend.
 func New(opts *Options) (Storage, error) {
 	return &dummyStorage{
-		opts:   opts,
+		opts: opts,
 	}, nil
 }
 
@@ -61,8 +61,8 @@ func (s *dummyStorage) List(p string) ([]FileEntry, error) {
 		}
 
 		files = append(files, FileEntry{
-			Path: path,
-			Size: fi.Size(),
+			Path:         path,
+			Size:         fi.Size(),
 			LastModified: fi.ModTime(),
 		})
 

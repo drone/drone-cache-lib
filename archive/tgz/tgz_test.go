@@ -7,13 +7,13 @@ import (
 	"log"
 	"os"
 	"testing"
-	. "github.com/franela/goblin"
 
 	"github.com/drone/drone-cache-lib/archive"
+	. "github.com/franela/goblin"
 )
 
 type mountFile struct {
-	Path string
+	Path    string
 	Content string
 }
 
@@ -186,7 +186,7 @@ func createMountContent() {
 	// Write files and their content
 	var err error
 	for _, element := range mountFiles {
-		err = ioutil.WriteFile("/tmp/fixtures/mounts/" + element.Path, []byte(element.Content), 0644)
+		err = ioutil.WriteFile("/tmp/fixtures/mounts/"+element.Path, []byte(element.Content), 0644)
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -223,8 +223,12 @@ func createDirectories() {
 
 func exists(path string) bool {
 	_, err := os.Stat(path)
-	if err == nil { return true }
-	if os.IsNotExist(err) { return false }
+	if err == nil {
+		return true
+	}
+	if os.IsNotExist(err) {
+		return false
+	}
 	return true
 }
 
@@ -244,7 +248,7 @@ var (
 		"subdir",
 	}
 
-	validFile = "/tmp/fixtures/tarfiles/test.tar.gz"
+	validFile   = "/tmp/fixtures/tarfiles/test.tar.gz"
 	invalidFile = "/tmp/fixtures/tarfiles/bad.tar.gz"
 	missingFile = "/tmp/fixtures/tarfiles/test2.tar.gz"
 )

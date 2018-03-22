@@ -1,11 +1,10 @@
 package cache
 
-import(
+import (
 	"time"
 
-	"github.com/drone/drone-cache-lib/storage"
-
 	log "github.com/Sirupsen/logrus"
+	"github.com/drone/drone-cache-lib/storage"
 )
 
 type DirtyFunc func(storage.FileEntry) bool
@@ -16,11 +15,11 @@ type Flusher struct {
 }
 
 func NewFlusher(s storage.Storage, fn DirtyFunc) Flusher {
-	return Flusher{ store: s, dirty: fn }
+	return Flusher{store: s, dirty: fn}
 }
 
 func NewDefaultFlusher(s storage.Storage) Flusher {
-	return Flusher{ store: s, dirty: IsExpired }
+	return Flusher{store: s, dirty: IsExpired}
 }
 
 func (f *Flusher) Flush(src string) error {
