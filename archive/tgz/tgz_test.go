@@ -83,7 +83,7 @@ func TestTgzArchive(t *testing.T) {
 				g.Assert(err == nil).IsTrue("Failed to unpack")
 			})
 
-			g.It("Should create files in correct strucutre", func() {
+			g.It("Should create files in correct structure", func() {
 				g.Assert(exists("/tmp/extracted/test.txt")).IsTrue("failed to create test.txt")
 				g.Assert(exists("/tmp/extracted/subdir")).IsTrue("failed to create subdir")
 				g.Assert(exists("/tmp/extracted/subdir/test2.txt")).IsTrue("failed to create subdir/test2.txt")
