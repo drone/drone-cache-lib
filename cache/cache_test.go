@@ -9,11 +9,11 @@ import (
 	"time"
 
 	"github.com/drone/drone-cache-lib/storage/dummy"
-	. "github.com/franela/goblin"
+	"github.com/franela/goblin"
 )
 
 func TestCache(t *testing.T) {
-	g := Goblin(t)
+	g := goblin.Goblin(t)
 	wd, _ := os.Getwd()
 
 	g.Describe("cache package", func() {
@@ -104,12 +104,12 @@ func TestCache(t *testing.T) {
 	})
 }
 
-func checkFileExists(fileName string, g *G) {
+func checkFileExists(fileName string, g *goblin.G) {
 	_, err := os.Stat(fileName)
 	g.Assert(err == nil).IsTrue(fileName + " should still exist")
 }
 
-func checkFileRemoved(fileName string, g *G) {
+func checkFileRemoved(fileName string, g *goblin.G) {
 	_, err := os.Stat(fileName)
 	g.Assert(err != nil).IsTrue("Failed to clean " + fileName)
 }

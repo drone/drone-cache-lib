@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/drone/drone-cache-lib/archive"
-	. "github.com/franela/goblin"
+	"github.com/franela/goblin"
 )
 
 type mountFile struct {
@@ -18,7 +18,7 @@ type mountFile struct {
 }
 
 func TestTgzArchive(t *testing.T) {
-	g := Goblin(t)
+	g := goblin.Goblin(t)
 	wd, _ := os.Getwd()
 
 	g.Describe("tgz package", func() {

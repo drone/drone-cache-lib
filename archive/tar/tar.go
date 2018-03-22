@@ -11,14 +11,14 @@ import (
 	"path/filepath"
 	"strings"
 
-	log "github.com/Sirupsen/logrus"
-	. "github.com/drone/drone-cache-lib/archive"
+	"github.com/Sirupsen/logrus"
+	"github.com/drone/drone-cache-lib/archive"
 )
 
 type tarArchive struct{}
 
-// NewTarArchive creates an Archive that uses the .tar file format.
-func New() Archive {
+// New creates an archive that uses the .tar file format.
+func New() archive.Archive {
 	return &tarArchive{}
 }
 
@@ -50,7 +50,7 @@ func (a *tarArchive) Pack(srcs []string, w io.Writer) error {
 				if link, err = os.Readlink(path); err != nil {
 					return err
 				}
-				log.Debugf("Symbolic link found at %s to %s", path, link)
+				logrus.Debugf("Symbolic link found at %s to %s", path, link)
 
 				// Rewrite header for SymLink
 				header, err = tar.FileInfoHeader(fi, link)
@@ -66,11 +66,11 @@ func (a *tarArchive) Pack(srcs []string, w io.Writer) error {
 			}
 
 			if !fi.Mode().IsRegular() {
-				log.Debugf("Directory found at %s", path)
+				logrus.Debugf("Directory found at %s", path)
 				return nil
 			}
 
-			log.Debugf("File found at %s", path)
+			logrus.Debugf("File found at %s", path)
 
 			file, err := os.Open(path)
 			if err != nil {
@@ -123,7 +123,7 @@ func (a *tarArchive) Unpack(dst string, r io.Reader) error {
 
 		// if its a symlink and it doesn't exist create it
 		case tar.TypeSymlink:
-			log.Debugf("Symlink found at %s", target)
+			logrus.Debugf("Symlink found at %s", target)
 
 			// Check if something already exists
 			_, err := os.Stat(target)
@@ -132,17 +132,17 @@ func (a *tarArchive) Unpack(dst string, r io.Reader) error {
 			}
 
 			// Create the link
-			log.Debugf("Creating link %s to %s", target, header.Linkname)
+			logrus.Debugf("Creating link %s to %s", target, header.Linkname)
 			err = os.Symlink(header.Linkname, target)
 
 			if err != nil {
-				log.Infof("Failed creating link %s to %s", target, header.Linkname)
+				logrus.Infof("Failed creating link %s to %s", target, header.Linkname)
 				return err
 			}
 
 		// if its a dir and it doesn't exist create it
 		case tar.TypeDir:
-			log.Debugf("Directory found at %s", target)
+			logrus.Debugf("Directory found at %s", target)
 			if _, err := os.Stat(target); err != nil {
 				if err := os.MkdirAll(target, 0755); err != nil {
 					return err
@@ -151,7 +151,7 @@ func (a *tarArchive) Unpack(dst string, r io.Reader) error {
 
 		// if it's a file create it
 		case tar.TypeReg:
-			log.Debugf("File found at %s", target)
+			logrus.Debugf("File found at %s", target)
 			f, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode))
 			if err != nil {
 				return err

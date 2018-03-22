@@ -7,14 +7,14 @@ import (
 	"compress/gzip"
 	"io"
 
-	. "github.com/drone/drone-cache-lib/archive"
+	"github.com/drone/drone-cache-lib/archive"
 	"github.com/drone/drone-cache-lib/archive/tar"
 )
 
 type tgzArchive struct{}
 
-// NewTgzArchive creates an Archive that uses the .tar.gz file format.
-func New() Archive {
+// New creates an archive that uses the .tar.gz file format.
+func New() archive.Archive {
 	return &tgzArchive{}
 }
 
