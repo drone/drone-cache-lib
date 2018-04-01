@@ -2,11 +2,12 @@ package util
 
 import (
 	"testing"
-	. "github.com/franela/goblin"
+
+	"github.com/franela/goblin"
 )
 
 func TestArchive(t *testing.T) {
-	g := Goblin(t)
+	g := goblin.Goblin(t)
 
 	g.Describe("FromFilename", func() {
 		g.It("Should return tarArchive for .tar", func() {

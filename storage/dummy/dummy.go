@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
-	log "github.com/Sirupsen/logrus"
-	. "github.com/drone/drone-cache-lib/storage"
+	"github.com/Sirupsen/logrus"
+	"github.com/drone/drone-cache-lib/storage"
 )
 
 // Options contains configuration for the S3 connection.
@@ -18,13 +18,13 @@ type Options struct {
 }
 
 type dummyStorage struct {
-	opts   *Options
+	opts *Options
 }
 
 // New creates an implementation of Storage with Dummy as the backend.
-func New(opts *Options) (Storage, error) {
+func New(opts *Options) (storage.Storage, error) {
 	return &dummyStorage{
-		opts:   opts,
+		opts: opts,
 	}, nil
 }
 
@@ -37,32 +37,32 @@ func (s *dummyStorage) Get(p string, dst io.Writer) error {
 }
 
 func (s *dummyStorage) Put(p string, src io.Reader) error {
-	log.Infof("Reading for %s", p)
+	logrus.Infof("Reading for %s", p)
 
 	_, err := ioutil.ReadAll(src)
 
 	if err != nil {
-		log.Errorf("Failed to read for %s", p)
+		logrus.Errorf("Failed to read for %s", p)
 		return err
 	}
 
-	log.Infof("Finished reading for %s", p)
+	logrus.Infof("Finished reading for %s", p)
 
 	return nil
 }
 
-func (s *dummyStorage) List(p string) ([]FileEntry, error) {
-	log.Infof("Retrieving list of files from %s", p)
+func (s *dummyStorage) List(p string) ([]storage.FileEntry, error) {
+	logrus.Infof("Retrieving list of files from %s", p)
 
-	var files []FileEntry
+	var files []storage.FileEntry
 	fwErr := filepath.Walk(p, func(path string, fi os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 
-		files = append(files, FileEntry{
-			Path: path,
-			Size: fi.Size(),
+		files = append(files, storage.FileEntry{
+			Path:         path,
+			Size:         fi.Size(),
 			LastModified: fi.ModTime(),
 		})
 
@@ -77,7 +77,7 @@ func (s *dummyStorage) List(p string) ([]FileEntry, error) {
 }
 
 func (s *dummyStorage) Delete(p string) error {
-	log.Infof("Deleteing %s", p)
+	logrus.Infof("Deleteing %s", p)
 
 	return os.Remove(p)
 }

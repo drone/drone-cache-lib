@@ -3,16 +3,16 @@ workspace:
   path: src/github.com/drone/drone-cache-lib
 
 pipeline:
-  test:
-    image: golang:1.7
-    environment:
-      - CGO_ENABLED=0
+  deps:
+    image: golang:1.10
+    pull: true
     commands:
-      - go get -t ./...
-      - |
-        for pkg in $(go list ./...)
-        do
-          cd $GOPATH/src/$pkg/
-          go vet
-          go test -cover -coverprofile coverage.out
-        done
+      - go get -u github.com/golang/dep/cmd/dep
+      - dep ensure
+
+  test:
+    image: golang:1.10
+    pull: true
+    commands:
+      - go vet ./...
+      - go test -cover ./...

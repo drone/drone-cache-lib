@@ -7,13 +7,13 @@ import (
 	"os"
 	"testing"
 	"time"
-	. "github.com/franela/goblin"
 
 	"github.com/drone/drone-cache-lib/storage/dummy"
+	"github.com/franela/goblin"
 )
 
 func TestCache(t *testing.T) {
-	g := Goblin(t)
+	g := goblin.Goblin(t)
 	wd, _ := os.Getwd()
 
 	g.Describe("cache package", func() {
@@ -104,12 +104,12 @@ func TestCache(t *testing.T) {
 	})
 }
 
-func checkFileExists(fileName string, g *G) {
+func checkFileExists(fileName string, g *goblin.G) {
 	_, err := os.Stat(fileName)
 	g.Assert(err == nil).IsTrue(fileName + " should still exist")
 }
 
-func checkFileRemoved(fileName string, g *G) {
+func checkFileRemoved(fileName string, g *goblin.G) {
 	_, err := os.Stat(fileName)
 	g.Assert(err != nil).IsTrue("Failed to clean " + fileName)
 }
@@ -134,7 +134,7 @@ func createDirectories(directories []string) {
 func createMountContent() {
 	var err error
 	for _, element := range mountFiles {
-		err = ioutil.WriteFile("/tmp/fixtures/mounts/" + element.Path, []byte(element.Content), 0644)
+		err = ioutil.WriteFile("/tmp/fixtures/mounts/"+element.Path, []byte(element.Content), 0644)
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -142,9 +142,9 @@ func createMountContent() {
 }
 
 type testFile struct {
-	Path string
+	Path    string
 	Content string
-	Time time.Time
+	Time    time.Time
 }
 
 var (

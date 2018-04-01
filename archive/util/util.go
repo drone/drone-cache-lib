@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"strings"
 
-	. "github.com/drone/drone-cache-lib/archive"
+	"github.com/drone/drone-cache-lib/archive"
 	"github.com/drone/drone-cache-lib/archive/tar"
 	"github.com/drone/drone-cache-lib/archive/tgz"
 )
 
 // FromFilename determines the archive format to use based on the name.
-func FromFilename(name string) (Archive, error) {
+func FromFilename(name string) (archive.Archive, error) {
 	if strings.HasSuffix(name, ".tar") {
 		return tar.New(), nil
 	}

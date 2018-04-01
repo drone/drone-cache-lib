@@ -6,14 +6,14 @@ import (
 	"os"
 	"testing"
 	"time"
-	. "github.com/franela/goblin"
 
 	"github.com/drone/drone-cache-lib/storage"
 	"github.com/drone/drone-cache-lib/storage/dummy"
+	"github.com/franela/goblin"
 )
 
 func TestFlusher(t *testing.T) {
-	g := Goblin(t)
+	g := goblin.Goblin(t)
 	wd, _ := os.Getwd()
 
 	g.Describe("flusher package", func() {

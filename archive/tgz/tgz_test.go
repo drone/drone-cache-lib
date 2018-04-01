@@ -7,18 +7,18 @@ import (
 	"log"
 	"os"
 	"testing"
-	. "github.com/franela/goblin"
 
 	"github.com/drone/drone-cache-lib/archive"
+	"github.com/franela/goblin"
 )
 
 type mountFile struct {
-	Path string
+	Path    string
 	Content string
 }
 
 func TestTgzArchive(t *testing.T) {
-	g := Goblin(t)
+	g := goblin.Goblin(t)
 	wd, _ := os.Getwd()
 
 	g.Describe("tgz package", func() {
@@ -83,7 +83,7 @@ func TestTgzArchive(t *testing.T) {
 				g.Assert(err == nil).IsTrue("Failed to unpack")
 			})
 
-			g.It("Should create files in correct strucutre", func() {
+			g.It("Should create files in correct structure", func() {
 				g.Assert(exists("/tmp/extracted/test.txt")).IsTrue("failed to create test.txt")
 				g.Assert(exists("/tmp/extracted/subdir")).IsTrue("failed to create subdir")
 				g.Assert(exists("/tmp/extracted/subdir/test2.txt")).IsTrue("failed to create subdir/test2.txt")
@@ -186,7 +186,7 @@ func createMountContent() {
 	// Write files and their content
 	var err error
 	for _, element := range mountFiles {
-		err = ioutil.WriteFile("/tmp/fixtures/mounts/" + element.Path, []byte(element.Content), 0644)
+		err = ioutil.WriteFile("/tmp/fixtures/mounts/"+element.Path, []byte(element.Content), 0644)
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -223,8 +223,12 @@ func createDirectories() {
 
 func exists(path string) bool {
 	_, err := os.Stat(path)
-	if err == nil { return true }
-	if os.IsNotExist(err) { return false }
+	if err == nil {
+		return true
+	}
+	if os.IsNotExist(err) {
+		return false
+	}
 	return true
 }
 
@@ -244,7 +248,7 @@ var (
 		"subdir",
 	}
 
-	validFile = "/tmp/fixtures/tarfiles/test.tar.gz"
+	validFile   = "/tmp/fixtures/tarfiles/test.tar.gz"
 	invalidFile = "/tmp/fixtures/tarfiles/bad.tar.gz"
 	missingFile = "/tmp/fixtures/tarfiles/test2.tar.gz"
 )
