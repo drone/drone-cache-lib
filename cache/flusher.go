@@ -3,7 +3,7 @@ package cache
 import (
 	"time"
 
-	"github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/drone/drone-cache-lib/storage"
 )
 
@@ -28,7 +28,7 @@ func NewDefaultFlusher(s storage.Storage) Flusher {
 
 // Flush cleans the cache if it's expired.
 func (f *Flusher) Flush(src string) error {
-	logrus.Infof("Cleaning files from %s", src)
+	log.Infof("Cleaning files from %s", src)
 
 	files, err := f.store.List(src)
 	if err != nil {

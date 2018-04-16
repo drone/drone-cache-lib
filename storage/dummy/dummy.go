@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/drone/drone-cache-lib/storage"
 )
 
@@ -37,22 +37,22 @@ func (s *dummyStorage) Get(p string, dst io.Writer) error {
 }
 
 func (s *dummyStorage) Put(p string, src io.Reader) error {
-	logrus.Infof("Reading for %s", p)
+	log.Infof("Reading for %s", p)
 
 	_, err := ioutil.ReadAll(src)
 
 	if err != nil {
-		logrus.Errorf("Failed to read for %s", p)
+		log.Errorf("Failed to read for %s", p)
 		return err
 	}
 
-	logrus.Infof("Finished reading for %s", p)
+	log.Infof("Finished reading for %s", p)
 
 	return nil
 }
 
 func (s *dummyStorage) List(p string) ([]storage.FileEntry, error) {
-	logrus.Infof("Retrieving list of files from %s", p)
+	log.Infof("Retrieving list of files from %s", p)
 
 	var files []storage.FileEntry
 	fwErr := filepath.Walk(p, func(path string, fi os.FileInfo, err error) error {
@@ -77,7 +77,7 @@ func (s *dummyStorage) List(p string) ([]storage.FileEntry, error) {
 }
 
 func (s *dummyStorage) Delete(p string) error {
-	logrus.Infof("Deleteing %s", p)
+	log.Infof("Deleteing %s", p)
 
 	return os.Remove(p)
 }
