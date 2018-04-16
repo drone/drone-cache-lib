@@ -3,7 +3,7 @@ package cache
 import (
 	"io"
 
-	"github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/drone/drone-cache-lib/archive"
 	"github.com/drone/drone-cache-lib/archive/tar"
 	"github.com/drone/drone-cache-lib/storage"
@@ -36,14 +36,14 @@ func (c Cache) Restore(src string, fallback string) error {
 	err := restoreCache(src, c.s, c.a)
 
 	if err != nil && fallback != "" && fallback != src {
-		logrus.Warnf("Failed to retrieve %s, trying %s", src, fallback)
+		log.Warnf("Failed to retrieve %s, trying %s", src, fallback)
 		err = restoreCache(fallback, c.s, c.a)
 	}
 
 	// Cache plugin should print an error but it should not return it
 	// this is so the build continues even if the cache cant be restored
 	if err != nil {
-		logrus.Warnf("Cache could not be restored %s", err)
+		log.Warnf("Cache could not be restored %s", err)
 	}
 
 	return nil
@@ -72,7 +72,7 @@ func restoreCache(src string, s storage.Storage, a archive.Archive) error {
 }
 
 func rebuildCache(srcs []string, dst string, s storage.Storage, a archive.Archive) error {
-	logrus.Infof("Rebuilding cache at %s to %s", srcs, dst)
+	log.Infof("Rebuilding cache at %s to %s", srcs, dst)
 
 	reader, writer := io.Pipe()
 	defer reader.Close()
