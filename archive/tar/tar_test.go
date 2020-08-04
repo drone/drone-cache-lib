@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/drone/drone-cache-lib/archive"
 	"github.com/franela/goblin"
@@ -88,6 +89,19 @@ func TestTarArchive(t *testing.T) {
 				g.Assert(exists("/tmp/extracted/subdir")).IsTrue("failed to create subdir")
 				g.Assert(exists("/tmp/extracted/subdir/test2.txt")).IsTrue("failed to create subdir/test2.txt")
 				g.Assert(exists("/tmp/extracted/subdir/linkto_test.txt")).IsTrue("failed to create subdir/linkto_test.txt")
+			})
+
+			g.It("Should restore the correct modification timestamp", func() {
+				var err error
+				var file *os.File
+				var fileInfo os.FileInfo
+				for _, element := range mountFiles {
+					file, err = os.Open("/tmp/extracted/" + element.Path)
+					g.Assert(err == nil).IsTrue("failed to open " + element.Path)
+					fileInfo, err = file.Stat()
+					g.Assert(err == nil).IsTrue("failed to stat " + element.Path)
+					g.Assert(fileInfo.ModTime().Equal(time.Date(2020, 8, 5, 20, 23, 42, 0, time.UTC))).IsTrue("expected and actual modification time differ")
+				}
 			})
 
 			g.It("Should create files with correct content", func() {
@@ -186,7 +200,14 @@ func createMountContent() {
 	// Write files and their content
 	var err error
 	for _, element := range mountFiles {
-		err = ioutil.WriteFile("/tmp/fixtures/mounts/"+element.Path, []byte(element.Content), 0644)
+		path := "/tmp/fixtures/mounts/"+element.Path
+
+		err = ioutil.WriteFile(path, []byte(element.Content), 0644)
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		err = os.Chtimes(path, time.Now(), time.Date(2020, 8, 5, 20, 23, 42, 0, time.UTC))
 		if err != nil {
 			log.Fatalln(err)
 		}
