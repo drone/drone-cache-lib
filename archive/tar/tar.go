@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/drone/drone-cache-lib/archive"
@@ -162,6 +163,12 @@ func (a *tarArchive) Unpack(dst string, r io.Reader) error {
 
 			// Explicitly close otherwise too many files remain open
 			f.Close()
+
+			if err != nil {
+				return err
+			}
+
+			err = os.Chtimes(target, time.Now(), header.ModTime)
 
 			if err != nil {
 				return err
