@@ -9,11 +9,10 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/drone/drone-cache-lib/archive"
+	log "github.com/sirupsen/logrus"
 )
 
 type tarArchive struct{}
@@ -60,7 +59,7 @@ func (a *tarArchive) Pack(srcs []string, w io.Writer) error {
 				}
 			}
 
-			header.Name = strings.TrimPrefix(filepath.ToSlash(path), "/")
+			header.Name = filepath.ToSlash(path)
 
 			if err = tw.WriteHeader(header); err != nil {
 				return err
